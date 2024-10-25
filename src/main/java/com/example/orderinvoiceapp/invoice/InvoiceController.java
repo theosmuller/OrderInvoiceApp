@@ -17,7 +17,7 @@ public class InvoiceController {
 
     //POST http://localhost:8080/invoice/{customerId}
     @PostMapping("/invoice/{customerId}")
-    Flux<InvoiceDTO> invoiceCustomerOrdersBlocking(@PathVariable Long customerId){
+    Flux<Invoice> invoiceCustomerOrdersBlocking(@PathVariable Long customerId){
         return invoiceService.invoiceCustomerOrdersBlocking(customerId);
     }
     //
