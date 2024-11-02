@@ -1,11 +1,12 @@
 package com.example.orderinvoiceapp.customer;
 
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-
+@Service
 public class CustomerClient {
     // get customer data by Customer ID
     Mono<CustomerDTO> getCustomerDataByCustomerId(Long customerId) {

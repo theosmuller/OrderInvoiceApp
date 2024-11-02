@@ -1,19 +1,15 @@
 package com.example.orderinvoiceapp.invoice;
 
 import com.example.orderinvoiceapp.customer.CustomerValidatorService;
-import com.example.orderinvoiceapp.order.Order;
-import com.example.orderinvoiceapp.order.OrderLine;
 import com.example.orderinvoiceapp.order.OrderRepository;
 import com.example.orderinvoiceapp.product.ProductValidatorService;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 @Service
 @RequiredArgsConstructor
@@ -25,25 +21,58 @@ public class InvoiceService {
     private final ProductValidatorService productValidatorService;
 
     // For this customerId
-    // Validate customer
-    // Get all their orders
-    // For each order validate all products
-    // Then create invoices for all orders
-    // And change their statuses
+    // Validate customer (API)
+    // Get all their orders (DB)
+    // For each order validate all products (API)
+    // Then create invoices for all orders (DB)
+    // And change their statuses (DB)
 
-    // maybe worth doing a parallel and sequential implementation for this?
-
+    //    This version uses Schedulers.boundedElastic() for better parallel blocking performance.
+    //    Explicitly blocking at blockLast() ensures all validations complete for each order before proceeding to invoice creation,
+    //    simulating the impact of blocking on performance.
     public Flux<Invoice> invoiceCustomerOrdersBlocking(Long customerId) {
         return customerValidatorService.validate(customerId)
-                .thenReturn(orderRepository.getOrdersByCustomerId(customerId))
+                .thenReturn(orderRepository.getOrdersByCustomerId(customerId)) // Blocking repository call
+                .subscribeOn(Schedulers.boundedElastic())
                 .flatMapIterable(orders -> orders)
                 .parallel()
-                .doOnEach(order -> Flux.fromIterable(Objects.requireNonNull(order.get())
-                        .getOrderLines())
-                        .parallel()
-                        .doOnEach(productValidatorService::validateByOrderLine))
-                .map(order -> invoiceRepository.save(mapper.map(InvoiceDTO.builder().order(order).invoiceDate(ZonedDateTime.now()).build())))
+                .runOn(Schedulers.boundedElastic()) // Explicitly using bounded elastic for blocking operations
+                .doOnEach(order -> {
+                    // Blocking product validation for each order line, but done in parallel
+                    Flux.fromIterable(Objects.requireNonNull(order.get()).getOrderLines())
+                            .doOnEach(productValidatorService::validateByOrderLine)
+                            .blockLast(); // Ensures validation completes before proceeding
+                })
+                // Blocking call to save invoice
+                .map(order -> {
+                    Invoice invoice = invoiceRepository.save(
+                            mapper.map(InvoiceDTO.builder().order(order).invoiceDate(ZonedDateTime.now()).build()));
+                    orderRepository.updateOrderStatusByIdAndReturnId("INVOICED", order.getId());
+                    return invoice;
+                })
                 .sequential();
     }
 
+    // maybe worth doing a parallel and sequential implementation for this?
+
+    public Flux<Invoice> invoiceCustomerOrdersBlockingSequential(Long customerId) {
+        return customerValidatorService.validate(customerId)
+                .thenReturn(orderRepository.getOrdersByCustomerId(customerId)) // Blocking repository call
+                .subscribeOn(Schedulers.boundedElastic()) // Offload blocking call
+                .flatMapIterable(orders -> orders)
+                .doOnEach(order -> {
+                    // Blocking product validation for each order line
+                    Flux.fromIterable(Objects.requireNonNull(order.get()).getOrderLines())
+                            .doOnEach(productValidatorService::validateByOrderLine)
+                            .blockLast(); // Ensures validation completes before proceeding
+                })
+                // Blocking call to save invoice, offloaded to boundedElastic scheduler
+                .map(order -> {
+                    Invoice invoice = invoiceRepository.save(
+                            mapper.map(InvoiceDTO.builder().order(order).invoiceDate(ZonedDateTime.now()).build()));
+                    orderRepository.updateOrderStatusByIdAndReturnId("INVOICED", order.getId());
+                    return invoice;
+                })
+                .subscribeOn(Schedulers.boundedElastic());
+    }
 }
