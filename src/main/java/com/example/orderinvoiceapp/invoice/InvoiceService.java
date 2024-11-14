@@ -1,9 +1,13 @@
 package com.example.orderinvoiceapp.invoice;
 
 import com.example.orderinvoiceapp.customer.CustomerValidatorService;
-import com.example.orderinvoiceapp.order.OrderRepository;
+import com.example.orderinvoiceapp.repository.blocking.InvoiceRepository;
+import com.example.orderinvoiceapp.repository.blocking.OrderRepository;
 import com.example.orderinvoiceapp.product.ProductValidatorService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
@@ -14,6 +18,8 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class InvoiceService {
+    @Autowired
+    private JdbcMappingContext jdbcMappingContext;
     private final InvoiceRepository invoiceRepository;
     private final InvoiceMapper mapper;
     private final OrderRepository orderRepository;

@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Data
 @AllArgsConstructor
-@Table("Order")
+@Table("Sales_Order")
 public class Order {
     @Id
     private Long id;

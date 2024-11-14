@@ -1,5 +1,6 @@
-package com.example.orderinvoiceapp.order;
+package com.example.orderinvoiceapp.repository.blocking;
 
+import com.example.orderinvoiceapp.order.Order;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
