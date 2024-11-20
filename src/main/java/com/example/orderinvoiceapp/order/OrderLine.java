@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 
-@Table("OrderLine")
+@Table("ORDERLINE")
 public class OrderLine {
     @Id
     private Long id;

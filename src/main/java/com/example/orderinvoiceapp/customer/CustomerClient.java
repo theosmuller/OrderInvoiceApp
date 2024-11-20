@@ -14,7 +14,7 @@ public class CustomerClient {
                 .thenReturn(CustomerDTO.builder()
                         .id(customerId)
                         .address("Rua dos Alfeneiros 404")
-                        .birthday(ZonedDateTime.of(2000, 6, 3, 4, 2, 12, 10, ZoneId.of("BET")))
+                        .birthday(ZonedDateTime.of(2000, 6, 3, 4, 2, 12, 10, ZoneId.of("UTC")))
                         .name("John Doe")
                         .creditCardNumber("5523165749125199")
                         .build());

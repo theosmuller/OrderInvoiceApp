@@ -2,6 +2,7 @@ package com.example.orderinvoiceapp.product;
 
 import com.example.orderinvoiceapp.order.Order;
 import com.example.orderinvoiceapp.order.OrderLine;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -12,7 +13,7 @@ import java.util.Objects;
 import static com.example.orderinvoiceapp.product.ProductTypeEnum.DECOMISSIONED;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class ProductValidatorService {
     private final ProductClient productClient;
 

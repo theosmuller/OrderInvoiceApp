@@ -1,6 +1,7 @@
 package com.example.orderinvoiceapp.product;
 
 import com.example.orderinvoiceapp.customer.CustomerDTO;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -8,7 +9,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import static com.example.orderinvoiceapp.product.ProductTypeEnum.APPLIANCE;
-
+@Service
 public class ProductClient {
     //get product data by product ID
     public Mono<ProductDTO> getProductById(Long productId) {

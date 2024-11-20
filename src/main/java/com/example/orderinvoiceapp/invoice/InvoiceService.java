@@ -1,13 +1,11 @@
 package com.example.orderinvoiceapp.invoice;
 
 import com.example.orderinvoiceapp.customer.CustomerValidatorService;
+import com.example.orderinvoiceapp.product.ProductValidatorService;
 import com.example.orderinvoiceapp.repository.blocking.InvoiceRepository;
 import com.example.orderinvoiceapp.repository.blocking.OrderRepository;
-import com.example.orderinvoiceapp.product.ProductValidatorService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
-import org.springframework.jdbc.core.JdbcTemplate;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
@@ -16,10 +14,11 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
+@Slf4j
 public class InvoiceService {
-    @Autowired
-    private JdbcMappingContext jdbcMappingContext;
+//    @Autowired
+//    private JdbcMappingContext jdbcMappingContext;
     private final InvoiceRepository invoiceRepository;
     private final InvoiceMapper mapper;
     private final OrderRepository orderRepository;
@@ -37,7 +36,9 @@ public class InvoiceService {
     //    Explicitly blocking at blockLast() ensures all validations complete for each order before proceeding to invoice creation,
     //    simulating the impact of blocking on performance.
     public Flux<Invoice> invoiceCustomerOrdersBlocking(Long customerId) {
+        log.info("INVOICING CUSTOMER ORDERS BLOCKING");
         return customerValidatorService.validate(customerId)
+                .log()
                 .thenReturn(orderRepository.getOrdersByCustomerId(customerId)) // Blocking repository call
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMapIterable(orders -> orders)
