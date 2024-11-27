@@ -34,7 +34,7 @@ public class SalesOrder {
     @Column(name = "STATUS")
     private String status;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "order_id")
-    @JoinColumn(name = "ID", referencedColumnName = "ORDER_ID")
-    private Set<OrderLine> orderLines = new HashSet<>();
+//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order_id")
+//    @JoinColumn(name = "ID", referencedColumnName = "ORDER_ID")
+//    private Set<OrderLine> orderLines = new HashSet<>();
 }

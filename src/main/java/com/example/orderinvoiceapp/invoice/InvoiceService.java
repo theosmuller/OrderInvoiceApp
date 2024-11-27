@@ -37,6 +37,7 @@ public class InvoiceService {
     //    simulating the impact of blocking on performance.
     public Flux<Invoice> invoiceCustomerOrdersBlocking(Long customerId) {
         log.info("INVOICING CUSTOMER ORDERS BLOCKING");
+
         return customerValidatorService.validate(customerId)
                 .log()
                 .thenReturn(orderRepository.findOrdersByCustomerId(customerId)) // Blocking repository call
@@ -46,9 +47,9 @@ public class InvoiceService {
                 .runOn(Schedulers.boundedElastic()) // Explicitly using bounded elastic for blocking operations
                 .doOnEach(order -> {
                     // Blocking product validation for each order line, but done in parallel
-                    Flux.fromIterable(Objects.requireNonNull(order.get()).getOrderLines())
-                            .doOnEach(productValidatorService::validateByOrderLine)
-                            .blockLast(); // Ensures validation completes before proceeding
+//                    Flux.fromIterable(Objects.requireNonNull(order.get()).getOrderLines())
+//                            .doOnEach(productValidatorService::validateByOrderLine)
+//                            .blockLast(); // Ensures validation completes before proceeding
                 })
                 // Blocking call to save invoice
                 .map(order -> {
