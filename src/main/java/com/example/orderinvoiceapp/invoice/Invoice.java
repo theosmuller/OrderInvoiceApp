@@ -1,6 +1,8 @@
 package com.example.orderinvoiceapp.invoice;
 
-import com.example.orderinvoiceapp.order.Order;
+import com.example.orderinvoiceapp.order.SalesOrder;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,10 +18,11 @@ import java.time.ZonedDateTime;
 @Table("Invoice")
 public class Invoice {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private ZonedDateTime invoiceDate;
 
     @MappedCollection(idColumn = "order_id")
-    private Order order;
+    private SalesOrder salesOrder;
 
 }

@@ -39,7 +39,7 @@ public class InvoiceService {
         log.info("INVOICING CUSTOMER ORDERS BLOCKING");
         return customerValidatorService.validate(customerId)
                 .log()
-                .thenReturn(orderRepository.getOrdersByCustomerId(customerId)) // Blocking repository call
+                .thenReturn(orderRepository.findOrdersByCustomerId(customerId)) // Blocking repository call
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMapIterable(orders -> orders)
                 .parallel()
@@ -53,7 +53,7 @@ public class InvoiceService {
                 // Blocking call to save invoice
                 .map(order -> {
                     Invoice invoice = invoiceRepository.save(
-                            mapper.map(InvoiceDTO.builder().order(order).invoiceDate(ZonedDateTime.now()).build()));
+                            mapper.map(InvoiceDTO.builder().salesOrder(order).invoiceDate(ZonedDateTime.now()).build()));
                     orderRepository.updateOrderStatusByIdAndReturnId("INVOICED", order.getId());
                     return invoice;
                 })
@@ -64,19 +64,19 @@ public class InvoiceService {
 
     public Flux<Invoice> invoiceCustomerOrdersBlockingSequential(Long customerId) {
         return customerValidatorService.validate(customerId)
-                .thenReturn(orderRepository.getOrdersByCustomerId(customerId)) // Blocking repository call
+                .thenReturn(orderRepository.findOrdersByCustomerId(customerId)) // Blocking repository call
                 .subscribeOn(Schedulers.boundedElastic()) // Offload blocking call
                 .flatMapIterable(orders -> orders)
                 .doOnEach(order -> {
                     // Blocking product validation for each order line
-                    Flux.fromIterable(Objects.requireNonNull(order.get()).getOrderLines())
-                            .doOnEach(productValidatorService::validateByOrderLine)
-                            .blockLast(); // Ensures validation completes before proceeding
+//                    Flux.fromIterable(Objects.requireNonNull(order.get()).getOrderLines())
+//                            .doOnEach(productValidatorService::validateByOrderLine)
+//                            .blockLast(); // Ensures validation completes before proceeding
                 })
                 // Blocking call to save invoice, offloaded to boundedElastic scheduler
                 .map(order -> {
                     Invoice invoice = invoiceRepository.save(
-                            mapper.map(InvoiceDTO.builder().order(order).invoiceDate(ZonedDateTime.now()).build()));
+                            mapper.map(InvoiceDTO.builder().salesOrder(order).invoiceDate(ZonedDateTime.now()).build()));
                     orderRepository.updateOrderStatusByIdAndReturnId("INVOICED", order.getId());
                     return invoice;
                 })

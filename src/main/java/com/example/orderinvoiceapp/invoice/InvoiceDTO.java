@@ -1,6 +1,6 @@
 package com.example.orderinvoiceapp.invoice;
 
-import com.example.orderinvoiceapp.order.Order;
+import com.example.orderinvoiceapp.order.SalesOrder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +13,6 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InvoiceDTO {
-    private Order order;
+    private SalesOrder salesOrder;
     private ZonedDateTime invoiceDate;
 }
