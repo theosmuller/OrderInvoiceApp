@@ -19,13 +19,13 @@ public class SalesOrderRepositoryTest {
 
     @Test
     public void testGetOrderById() {
-        Object salesOrder = orderRepository.getOrderById(1L);
+        Object salesOrder = orderRepository.getSalesOrderByOrderId(1L);
         assertNotNull(salesOrder);
     }
 
     @Test
-    public void testFindOrdersByCustomerId() {
-        List<SalesOrder> salesOrders = orderRepository.findOrdersByCustomerId(2L);
+    public void testFindSalesOrdersByCustomerId() {
+        List<SalesOrder> salesOrders = orderRepository.findSalesOrdersByCustomerId(2L);
         assertNotNull(salesOrders);
         assertFalse(salesOrders.isEmpty());
         salesOrders.forEach(System.out::println);

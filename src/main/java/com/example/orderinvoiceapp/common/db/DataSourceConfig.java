@@ -1,4 +1,4 @@
-package com.example.orderinvoiceapp.db;
+package com.example.orderinvoiceapp.common.db;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

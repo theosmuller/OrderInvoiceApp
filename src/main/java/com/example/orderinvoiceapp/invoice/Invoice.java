@@ -1,28 +1,27 @@
 package com.example.orderinvoiceapp.invoice;
 
-import com.example.orderinvoiceapp.order.SalesOrder;
+import com.example.orderinvoiceapp.common.utils.OracleZonedDateTimeSerializer;
+import jakarta.persistence.Convert;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.MappedCollection;
-import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.ZonedDateTime;
+import java.sql.Timestamp;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("Invoice")
+@Builder
+//@Table("Invoice")
+@Convert(converter=OracleZonedDateTimeSerializer.class)
 public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private ZonedDateTime invoiceDate;
-
-    @MappedCollection(idColumn = "order_id")
-    private SalesOrder salesOrder;
-
+    private Timestamp invoiceDate;
+    private Long orderId;
 }

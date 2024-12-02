@@ -25,6 +25,6 @@ public class InvoiceController {
     //TEST CONTROLLER TO GET DB TO WORK
     @PostMapping()
     SalesOrder insertMockOrder() {
-        return orderRepository.getOrderById(1L);
+        return orderRepository.getSalesOrderByOrderId(1L);
     }
 }

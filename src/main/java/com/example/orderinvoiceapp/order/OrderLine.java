@@ -1,24 +1,26 @@
 package com.example.orderinvoiceapp.order;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
-
-@Table(name = "ORDERLINE")
+@NoArgsConstructor
+@Entity
+@Table(name = "ORDER_LINE")
 public class OrderLine {
     @Id
     private Long id;
 
-//    @Column(name = "ORDER_ID")
-//    private Long orderId;
+    @Column(name = "ORDER_ID")
+    private Long orderId;
 
     @Column(name = "PRODUCT_ID")
     private Long productId;
@@ -32,7 +34,8 @@ public class OrderLine {
     @Column(name = "TOTAL_PRICE")
     private BigDecimal totalPrice;
 
-    @ManyToOne()
-    @JoinColumn(name = "ORDER_ID", referencedColumnName = "ID")
-    private SalesOrder salesOrder;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "ORDER_ID", nullable = false, insertable = false, updatable = false)
+//    @MapsId("orderId")
+//    private SalesOrder salesOrder;
 }

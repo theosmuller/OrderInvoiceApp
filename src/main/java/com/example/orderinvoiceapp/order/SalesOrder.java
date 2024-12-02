@@ -1,29 +1,25 @@
 package com.example.orderinvoiceapp.order;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 //@RequiredArgsConstructor
-//@Entity
-//@Table("SALES_ORDER")
+@Entity
+@Table("SALES_ORDER")
 public class SalesOrder {
     @Id
-    @Column(name = "ID", unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @Column(name = "ORDER_ID")
+    private Long orderId;
 
     @Column(name = "CUSTOMER_ID")
     private Long customerId;
@@ -34,7 +30,7 @@ public class SalesOrder {
     @Column(name = "STATUS")
     private String status;
 
-//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order_id")
+//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "salesOrder", cascade = CascadeType.ALL)
 //    @JoinColumn(name = "ID", referencedColumnName = "ORDER_ID")
-//    private Set<OrderLine> orderLines = new HashSet<>();
+//    private Set<OrderLine> orderLines = new HashSet<>(0);
 }
