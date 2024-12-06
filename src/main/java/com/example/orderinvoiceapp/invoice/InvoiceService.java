@@ -1,6 +1,7 @@
 package com.example.orderinvoiceapp.invoice;
 
 import com.example.orderinvoiceapp.customer.CustomerValidatorService;
+import com.example.orderinvoiceapp.order.OrderLine;
 import com.example.orderinvoiceapp.order.SalesOrder;
 import com.example.orderinvoiceapp.product.ProductValidatorService;
 import com.example.orderinvoiceapp.repository.blocking.InvoiceRepository;
@@ -100,10 +101,20 @@ public class InvoiceService {
 //                .subscribeOn(Schedulers.boundedElastic());
 //    }
 
-    public Flux<SalesOrder> invoiceCustomerOrdersSequential(Long customerId) {
+    public Flux<Invoice> invoiceCustomerOrdersSequential(Long customerId) {
         return customerValidatorService.validate(customerId)
                 .log()
-                .thenMany(reactiveOrderRepository.findSalesOrdersByCustomerId(customerId));
+                .thenMany(reactiveOrderRepository.findSalesOrdersByCustomerId(customerId))
+                .flatMap(order -> reactiveOrderLineRepository.findByOrderId(order.getOrderId())
+                        .doOnEach(productValidatorService::validateByOrderLine)
+                        .next()
+                        .thenReturn(order))
+                .flatMap(order -> reactiveInvoiceRepository.save(Invoice.builder().orderId(order.getOrderId()).invoiceDate(Timestamp.from(Instant.now())).build())
+                        .map(invoice -> {
+                            order.setStatus("INVOICED");
+                            reactiveOrderRepository.save(order);
+                            return invoice;
+                        }));
         //TODO: ESSE É O BLOCO PROBLEMÁTICO
         //also tem que fazer uma branch separada pra isso tudo q ta r2dbc based
 //                .doOnEach(order ->

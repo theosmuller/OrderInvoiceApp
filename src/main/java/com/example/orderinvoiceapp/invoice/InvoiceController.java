@@ -1,5 +1,6 @@
 package com.example.orderinvoiceapp.invoice;
 
+import com.example.orderinvoiceapp.order.OrderLine;
 import com.example.orderinvoiceapp.order.SalesOrder;
 import com.example.orderinvoiceapp.repository.blocking.OrderRepository;
 import com.example.orderinvoiceapp.repository.reactive.ReactiveOrderRepository;
@@ -32,7 +33,7 @@ public class InvoiceController {
 //    }
 
     @PostMapping("/invoice/{customerId}/seq/r")
-    Flux<SalesOrder> invoiceCustomerOrdersSequential(@PathVariable Long customerId) {
+    Flux<Invoice> invoiceCustomerOrdersSequential(@PathVariable Long customerId) {
         long startTime = System.currentTimeMillis();
         return invoiceService.invoiceCustomerOrdersSequential(customerId).doOnComplete(() -> log.info("Time elapsed: {}\n CPU usage: {}", System.currentTimeMillis() - startTime, System.getProperties()));
 
