@@ -1,6 +1,8 @@
 package com.example.orderinvoiceapp.order;
 
+import com.example.orderinvoiceapp.common.utils.OracleZonedDateTimeSerializer;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +15,7 @@ import java.sql.Timestamp;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-//@RequiredArgsConstructor
+@Convert(converter= OracleZonedDateTimeSerializer.class)
 @Entity
 @Table("SALES_ORDER")
 public class SalesOrder {

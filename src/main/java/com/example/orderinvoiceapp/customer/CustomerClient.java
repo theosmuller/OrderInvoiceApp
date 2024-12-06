@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 public class CustomerClient {
     // get customer data by Customer ID
     Mono<CustomerDTO> getCustomerDataByCustomerId(Long customerId) {
-        return Mono.delay(Duration.ofMillis(10))
+        return Mono.delay(Duration.ofMillis(1000))
                 .thenReturn(CustomerDTO.builder()
                         .id(customerId)
                         .address("Rua dos Alfeneiros 404")

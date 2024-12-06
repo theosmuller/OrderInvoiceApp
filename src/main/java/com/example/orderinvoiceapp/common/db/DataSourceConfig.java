@@ -5,10 +5,13 @@ import com.zaxxer.hikari.HikariDataSource;
 import oracle.jdbc.pool.OracleDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+
 import javax.sql.DataSource;
 import java.sql.SQLException;
 
 @Configuration
+//@EnableJdbcRepositories(basePackages = "com.example.orderinvoiceapp.repository.blocking")
 //@PropertySource("src/main/resources/application.properties")
 public class DataSourceConfig extends HikariConfig {
 

@@ -13,7 +13,7 @@ import static com.example.orderinvoiceapp.product.ProductTypeEnum.APPLIANCE;
 public class ProductClient {
     //get product data by product ID
     public Mono<ProductDTO> getProductById(Long productId) {
-        return Mono.delay(Duration.ofMillis(10))
+        return Mono.delay(Duration.ofMillis(1000))
                 .thenReturn(ProductDTO.builder()
                         .sku("123-ABCD")
                         .name("Fritadeira Airfryer Essential XL Digital Philips Walita Preta 2000W - RI9270")
