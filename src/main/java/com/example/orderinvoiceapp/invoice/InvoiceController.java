@@ -39,6 +39,13 @@ public class InvoiceController {
 
     }
 
+    @PostMapping("/invoice/{customerId}/r")
+    Flux<Invoice> invoiceCustomerOrders(@PathVariable Long customerId) {
+        long startTime = System.currentTimeMillis();
+        return invoiceService.invoiceCustomerOrders(customerId).doOnComplete(() -> log.info("Time elapsed: {}\n CPU usage: {}", System.currentTimeMillis() - startTime, System.getProperties()));
+
+    }
+
     @GetMapping()
     Flux<SalesOrder> test() {
         return reactiveOrderRepository.findSalesOrdersByCustomerId(1L);

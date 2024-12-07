@@ -23,4 +23,11 @@ public class ProductValidatorService {
                 .map(productDTO -> !DECOMISSIONED.equals(productDTO.getProductType()) && !productDTO.getPrice().isNaN())
                 .flatMap(isValid -> !isValid ? Mono.error(new RuntimeException("Product is invalid")) : Mono.just(Boolean.TRUE));
     }
+
+    public Mono<Boolean> validateByOrderLine(OrderLine orderLine) {
+        log.info("Validating order line={}", orderLine);
+        return productClient.getProductById(Objects.requireNonNull(orderLine).getProductId())
+                .map(productDTO -> !DECOMISSIONED.equals(productDTO.getProductType()) && !productDTO.getPrice().isNaN())
+                .flatMap(isValid -> !isValid ? Mono.error(new RuntimeException("Product is invalid")) : Mono.just(Boolean.TRUE));
+    }
 }

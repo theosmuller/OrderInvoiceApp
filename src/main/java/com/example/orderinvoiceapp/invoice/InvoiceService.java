@@ -106,7 +106,7 @@ public class InvoiceService {
                 .log()
                 .thenMany(reactiveOrderRepository.findSalesOrdersByCustomerId(customerId))
                 .flatMap(order -> reactiveOrderLineRepository.findByOrderId(order.getOrderId())
-                        .doOnEach(productValidatorService::validateByOrderLine)
+                        .flatMap(productValidatorService::validateByOrderLine)
                         .next()
                         .thenReturn(order))
                 .flatMap(order -> reactiveInvoiceRepository.save(Invoice.builder().orderId(order.getOrderId()).invoiceDate(Timestamp.from(Instant.now())).build())
@@ -115,19 +115,23 @@ public class InvoiceService {
                             reactiveOrderRepository.save(order);
                             return invoice;
                         }));
-        //TODO: ESSE É O BLOCO PROBLEMÁTICO
-        //also tem que fazer uma branch separada pra isso tudo q ta r2dbc based
-//                .doOnEach(order ->
-//                        reactiveOrderLineRepository.findByOrderId(Objects.requireNonNull(order.get()).getOrderId())
-//                                .doOnEach(productValidatorService::validateByOrderLine)
-//                );
-//                .map(order -> reactiveInvoiceRepository.save(Invoice.builder().orderId(order.getOrderId()).invoiceDate(Timestamp.from(Instant.now())).build())
-//                        .map(invoice -> {
-//                            order.setStatus("INVOICED");
-//                            reactiveOrderRepository.save(order);
-//                            return invoice;
-//                        })
-//                );
     }
 
+    public Flux<Invoice> invoiceCustomerOrders(Long customerId) {
+        return customerValidatorService.validate(customerId)
+                .log()
+                .thenMany(reactiveOrderRepository.findSalesOrdersByCustomerId(customerId))
+                .parallel()
+                .flatMap(order -> reactiveOrderLineRepository.findByOrderId(order.getOrderId())
+                        .flatMap(productValidatorService::validateByOrderLine)
+                        .next()
+                        .thenReturn(order))
+                .flatMap(order -> reactiveInvoiceRepository.save(Invoice.builder().orderId(order.getOrderId()).invoiceDate(Timestamp.from(Instant.now())).build())
+                        .map(invoice -> {
+                            order.setStatus("INVOICED");
+                            reactiveOrderRepository.save(order);
+                            return invoice;
+                        }))
+                .sequential();
+    }
 }
