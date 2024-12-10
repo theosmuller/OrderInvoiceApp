@@ -51,15 +51,13 @@ public class InvoiceService {
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMapIterable(orders -> orders)
                 .parallel()
-//                .runOn(Schedulers.boundedElastic()) // Explicitly using bounded elastic for blocking operations
-                .doOnEach(order -> {
-                    if (order.hasValue())
+                .flatMap(order -> {
                         // Blocking product validation for each order line, but done in parallel
-                        Flux.fromIterable(orderLineRepository.findByOrderId((order.get()).getOrderId()))
-                                .doOnEach(productValidatorService::validateByOrderLine);
-                    //                            .blockLast(); // Ensures validation completes before proceeding
+                        return Flux.fromIterable(orderLineRepository.findByOrderId((order.getOrderId())))
+                                .flatMap(productValidatorService::validateByOrderLine)
+                                .next()
+                                .thenReturn(order);
                 })
-//                .sequential()
                 // Blocking call to save invoice
                 .map(order -> {
                     Invoice invoice = invoiceRepository.save(
@@ -79,11 +77,12 @@ public class InvoiceService {
                 .thenReturn(orderRepository.findSalesOrdersByCustomerId(customerId)) // Blocking repository call
                 .subscribeOn(Schedulers.boundedElastic()) // Offload blocking call
                 .flatMapIterable(orders -> orders)
-                .doOnEach(order -> {
-                    if (order.hasValue())
+                .flatMap(order -> {
                         // Blocking product validation for each order line
-                        Flux.fromIterable(Objects.requireNonNull(orderLineRepository.findByOrderId(Objects.requireNonNull(order.get()).getOrderId())))
-                                .doOnEach(productValidatorService::validateByOrderLine);
+                        return Flux.fromIterable(orderLineRepository.findByOrderId((order.getOrderId())))
+                                .flatMap(productValidatorService::validateByOrderLine)
+                                .next()
+                                .thenReturn(order);
                 })
                 // Blocking call to save invoice, offloaded to boundedElastic scheduler
                 .map(order -> {
@@ -92,8 +91,7 @@ public class InvoiceService {
                     order.setStatus("INVOICED");
                     orderRepository.save(order);
                     return invoice;
-                })
-                .subscribeOn(Schedulers.boundedElastic());
+                });
     }
 
 //    public Flux<SalesOrder> invoiceCustomerOrdersSequential(Long customerId) {

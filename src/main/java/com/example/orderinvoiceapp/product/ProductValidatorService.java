@@ -17,9 +17,9 @@ import static com.example.orderinvoiceapp.product.ProductTypeEnum.DECOMISSIONED;
 public class ProductValidatorService {
     private final ProductClient productClient;
 
-    public Mono<Boolean> validateByOrderLine(Signal<OrderLine> orderLine) {
+    public Mono<Boolean> validateByOrderLine(OrderLine orderLine) {
         log.info("Validating order line={}", orderLine);
-        return productClient.getProductById(Objects.requireNonNull(orderLine.get()).getProductId())
+        return productClient.getProductById(Objects.requireNonNull(orderLine).getProductId())
                 .map(productDTO -> !DECOMISSIONED.equals(productDTO.getProductType()) && !productDTO.getPrice().isNaN())
                 .flatMap(isValid -> !isValid ? Mono.error(new RuntimeException("Product is invalid")) : Mono.just(Boolean.TRUE));
     }
