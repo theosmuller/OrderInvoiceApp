@@ -1,12 +1,9 @@
 package com.example.orderinvoiceapp.invoice;
 
-import com.example.orderinvoiceapp.order.OrderLine;
 import com.example.orderinvoiceapp.order.SalesOrder;
-import com.example.orderinvoiceapp.repository.blocking.OrderRepository;
 import com.example.orderinvoiceapp.repository.reactive.ReactiveOrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import oracle.jdbc.proxy.annotation.Post;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
