@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 import java.sql.SQLException;
 
 @Configuration
-//@EnableJdbcRepositories(basePackages = "com.example.orderinvoiceapp.repository.blocking")
+@EnableJdbcRepositories(basePackages = "com.example.orderinvoiceapp.repository.blocking")
 //@PropertySource("src/main/resources/application.properties")
 public class DataSourceConfig extends HikariConfig {
 
@@ -19,7 +19,7 @@ public class DataSourceConfig extends HikariConfig {
     public DataSource dataSource() throws SQLException {
         OracleDataSource dataSource = new OracleDataSource();
 //        dataSource.setDriverClassName("oracle.jdbc.OracleDriver");
-        dataSource.setURL("jdbc:oracle:thin:@192.168.1.211:1521:XE");
+        dataSource.setURL("jdbc:oracle:thin:@192.168.1.212:1521:XE");
         dataSource.setUser("theosmuller");
         dataSource.setPassword("hoivgd80");
 

@@ -18,7 +18,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table("Invoice")
+@Table("INVOICE")
 @Convert(converter=OracleZonedDateTimeSerializer.class)
 public class Invoice {
     @Id
