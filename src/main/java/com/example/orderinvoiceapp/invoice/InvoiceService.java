@@ -20,17 +20,12 @@ import java.util.Objects;
 @AllArgsConstructor
 @Slf4j
 public class InvoiceService {
-    //    @Autowired
-//    private JdbcMappingContext jdbcMappingContext;
-    private final InvoiceMapper mapper;
+
     private final CustomerValidatorService customerValidatorService;
     private final ProductValidatorService productValidatorService;
     private final InvoiceRepository invoiceRepository;
     private final OrderRepository orderRepository;
     private final OrderLineRepository orderLineRepository;
-//    private final ReactiveOrderRepository reactiveOrderRepository;
-//    private final ReactiveOrderLineRepository reactiveOrderLineRepository;
-//    private final ReactiveInvoiceRepository reactiveInvoiceRepository;
 
     // For this customerId
     // Validate customer (API)
@@ -56,6 +51,7 @@ public class InvoiceService {
                         return Flux.fromIterable(orderLineRepository.findByOrderId((order.getOrderId())))
                                 .flatMap(productValidatorService::validateByOrderLine)
                                 .next()
+                                .publishOn(Schedulers.boundedElastic())
                                 .thenReturn(order);
                 })
                 // Blocking call to save invoice
@@ -82,6 +78,7 @@ public class InvoiceService {
                         return Flux.fromIterable(orderLineRepository.findByOrderId((order.getOrderId())))
                                 .flatMap(productValidatorService::validateByOrderLine)
                                 .next()
+                                .publishOn(Schedulers.boundedElastic())
                                 .thenReturn(order);
                 })
                 // Blocking call to save invoice, offloaded to boundedElastic scheduler
@@ -93,23 +90,5 @@ public class InvoiceService {
                     return invoice;
                 });
     }
-
-//    public Flux<SalesOrder> invoiceCustomerOrdersSequential(Long customerId) {
-//        return customerValidatorService.validate(customerId)
-//                .log()
-//                .thenMany(reactiveOrderRepository.findSalesOrdersByCustomerId(customerId));
-        //also tem que fazer uma branch separada pra isso tudo q ta r2dbc based
-//                .doOnEach(order ->
-//                        reactiveOrderLineRepository.findByOrderId(Objects.requireNonNull(order.get()).getOrderId())
-//                                .doOnEach(productValidatorService::validateByOrderLine)
-//                );
-//                .map(order -> reactiveInvoiceRepository.save(Invoice.builder().orderId(order.getOrderId()).invoiceDate(Timestamp.from(Instant.now())).build())
-//                        .map(invoice -> {
-//                            order.setStatus("INVOICED");
-//                            reactiveOrderRepository.save(order);
-//                            return invoice;
-//                        })
-//                );
-//    }
 
 }
